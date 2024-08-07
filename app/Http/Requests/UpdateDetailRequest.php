@@ -23,8 +23,6 @@ class UpdateDetailRequest extends FormRequest
     {
         return [
             'age' => 'nullable|integer',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255',
             'gender' => 'nullable|string',
             'avatar_url' => 'nullable|string',

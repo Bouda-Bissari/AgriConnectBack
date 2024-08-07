@@ -15,13 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('email')->unique()->nullable();
-            $table->string('last_name');
-            $table->string('first_name');
-            $table->integer('age'); 
+            $table->integer('age')->nullable(); 
             $table->enum('gender', ['Masculin', 'Feminin']);
             $table->string('avatar_url')->nullable();
-            $table->text('bio'); 
-            $table->string('address');
+            $table->text('bio')->nullable(); 
+            $table->string('address')->nullable();
             $table->enum('domaine', [
                 'Culture de céréales',
                 'Culture de légumes',

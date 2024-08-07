@@ -22,6 +22,9 @@ class ServiceFactory extends Factory
             'description' => $this->faker->paragraph, 
             'service_type' => $this->faker->randomElement(['work', 'material']), 
             'deadline' => $this->faker->dateTimeBetween('now', '+1 year'), 
+            'image' => 'https://picsum.photos/200/300',
+            'location' => $this->faker->address,
+            'price' => $this->faker->numberBetween(1000, 100000),
             'user_id' => User::inRandomOrder()->first()->id, 
         ];
     }

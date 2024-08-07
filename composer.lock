@@ -4,8 +4,68 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ee2d10af8d4273661186700b123caeab",
+    "content-hash": "b2e4e3e761947da5c249d5fb515363f1",
     "packages": [
+        {
+            "name": "alirezasedghi/laravel-image-faker",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AlirezaSedghi/laravel-image-faker.git",
+                "reference": "1b7d84f30f41d0881d6ff20d191c2833bcf1fcbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AlirezaSedghi/laravel-image-faker/zipball/1b7d84f30f41d0881d6ff20d191c2833bcf1fcbf",
+                "reference": "1b7d84f30f41d0881d6ff20d191c2833bcf1fcbf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "laravel",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Alirezasedghi\\LaravelImageFaker\\ImageFakerServiceProvider"
+                    ],
+                    "aliases": {
+                        "ImageFaker": "Alirezasedghi\\LaravelImageFaker\\Facades\\ImageFaker"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Alirezasedghi\\LaravelImageFaker\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alireza Sedghi",
+                    "email": "alirezasedghi911@gmail.com"
+                }
+            ],
+            "description": "A library to generate fake images for Laravel",
+            "homepage": "https://github.com/AlirezaSedghi/laravel-image-faker",
+            "keywords": [
+                "faker",
+                "image",
+                "image-faker",
+                "laravel",
+                "laravel-faker",
+                "php",
+                "random-image"
+            ],
+            "support": {
+                "issues": "https://github.com/AlirezaSedghi/laravel-image-faker/issues",
+                "source": "https://github.com/AlirezaSedghi/laravel-image-faker/tree/v1.0"
+            },
+            "time": "2023-05-04T18:30:41+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.12.1",

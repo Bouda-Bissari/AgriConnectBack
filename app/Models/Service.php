@@ -24,4 +24,8 @@ class Service extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function details()
+{
+    return $this->hasOne(Detail::class);
+}
 }

@@ -89,9 +89,12 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = $user->createToken('user')->plainTextToken;
 
+        $role = $user->roles()->first()->name;
+
         return response()->json([
             'user' => $user,
             'token' => $token,
+            'role' => $role,
         ]);
 
     }
