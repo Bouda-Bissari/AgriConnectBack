@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Candidature;
 use App\Models\Detail;
 use App\Models\Service;
 use App\Models\User;
@@ -26,5 +27,8 @@ class DatabaseSeeder extends Seeder
         // ]);
         Detail::factory(10)->create();
         Service::factory(10)->create();
+
+        Candidature::factory(10)->create();
+
     }
 }

@@ -76,93 +76,95 @@ class ProfilController extends Controller
      * @param User $user
      * @return JsonResponse
      */
-//     public function update(UpdateProfileRequest $request, $userId)
-//     {
+    public function update(UpdateProfileRequest $request, $userId)
+    {
+        // Récupérer l'utilisateur par son ID
+        $user = User::findOrFail($userId);
+        
+        // Mise à jour des informations de l'utilisateur
+        $user->update($request->only(['fullName', 'phone_number']));
+        
+        // Récupérer ou créer les détails associés
+        $details = $user->details;
+        
+        if (!$details) {
+            $details = new Detail();
+            $details->user_id = $user->id;
+        }
+        
+        // Mise à jour des détails
+        $details->fill($request->only([
+            'email',
+            'date',
+            'gender',
+            'bio',
+            'company_name',
+            'address',
+            'domaine'
+        ]));
+        $details->save();
+        
+        // Gérer la mise à jour de l'image si nécessaire
+        if ($request->hasFile('avatar_url')) {
+            $file = $request->file('avatar_url');
+            $filePath = $file->store('avatars', 'public');
+            $user->avatar_url = $filePath;
+            $user->save();
+        }
+        
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès',
+            'details' => $details,
+            'request' => $request->all()
+        ]);
+    }
+    
 
-//         //dump($request);
-//         // Récupérer l'utilisateur par son ID
-//         $user = User::findOrFail($userId);
-    
-//         // Mise à jour des informations de l'utilisateur
-//         $user->update($request->only(['fullName', 'phone_number']));
-    
-//         // Récupérer ou créer les détails associés
-//         $details = $user->details;
-    
-//         if (!$details) {
-//             // Si aucun détail n'existe, en créer un nouveau
-//             $details = new Detail();
-//             $details->user_id = $user->id;
-//         }
-    
-//         // Mise à jour des détails
-//         $details->update($request->only([
-//             'email',
-//             'age',
-//             'gender',
-//             'bio',
-//             'company_name',
-//             'address',
-//             'domaine'
-//         ]));
-    
-//         // Gérer la mise à jour de l'image si nécessaire
-//         if ($request->hasFile('avatar_url')) {
-//             $file = $request->file('avatar_url');
-//             $filePath = $file->store('avatars', 'public');
-//             $user->avatar_url = $filePath;
-//             $user->save();
-//         }
-    
-//         return response()->json(['message' => 'Profil mis à jour avec succès',
-//     "details"=>$details,
-// "request" => $request->all()]);
+
+// public function update(UpdateProfileRequest $request, $userId): JsonResponse
+// {
+//     $authenticatedUser = Auth::user();
+
+//     // Vérifiez que l'utilisateur connecté peut mettre à jour ses propres informations
+//     if ($authenticatedUser->id !== (int)$userId) {
+//         return response()->json(['error' => 'Unauthorized'], 403);
 //     }
 
-public function update(UpdateProfileRequest $request, $userId): JsonResponse
-{
-    $authenticatedUser = Auth::user();
+//     $user = User::findOrFail($userId);
 
-    // Vérifiez que l'utilisateur connecté peut mettre à jour ses propres informations
-    if ($authenticatedUser->id !== (int)$userId) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+//     // Mise à jour des informations de l'utilisateur
+//     $user->update($request->only(['fullName', 'phone_number']));
 
-    $user = User::findOrFail($userId);
+//     $details = $user->details;
 
-    // Mise à jour des informations de l'utilisateur
-    $user->update($request->only(['fullName', 'phone_number']));
+//     if (!$details) {
+//         $details = new Detail();
+//         $details->user_id = $user->id;
+//     }
 
-    $details = $user->details;
+//     $details->update($request->only([
+//         'email',
+//         'age',
+//         'gender',
+//         'bio',
+//         'company_name',
+//         'address',
+//         'domaine'
+//     ]));
 
-    if (!$details) {
-        $details = new Detail();
-        $details->user_id = $user->id;
-    }
+//     if ($request->hasFile('avatar_url')) {
+//         $file = $request->file('avatar_url');
+//         $filePath = $file->store('avatars', 'public');
+//         $user->avatar_url = $filePath;
+//         $user->save();
+//     }
 
-    $details->update($request->only([
-        'email',
-        'age',
-        'gender',
-        'bio',
-        'company_name',
-        'address',
-        'domaine'
-    ]));
-
-    if ($request->hasFile('avatar_url')) {
-        $file = $request->file('avatar_url');
-        $filePath = $file->store('avatars', 'public');
-        $user->avatar_url = $filePath;
-        $user->save();
-    }
-
-    return response()->json([
-        'message' => 'Profil mis à jour avec succès',
-        "details" => $details,
-        "request" => $request->all()
-    ]);
-}
+//     return response()->json([
+//         'message' => 'Profil mis à jour avec succès',
+//         "details" => $details,
+//         "request" => $request->all()
+//     ]);
+// }
     
     
 

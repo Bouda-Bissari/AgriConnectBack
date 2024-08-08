@@ -5,18 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Detail extends Model
+class Candidature extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','email','date','gender','avatar_url','bio','company_name','address','domaine'];
+    protected $fillable = [
+        'user_id',
+        'service_id',
+        'status',
+        'message'
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function service()
-{
-    return $this->belongsTo(Service::class);
-}
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

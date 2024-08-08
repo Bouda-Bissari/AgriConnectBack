@@ -43,7 +43,9 @@ class UpdateProfileRequest extends FormRequest
                 'email',
                 Rule::unique('details', 'email')->ignore($this->route('profile')),
             ],
-            'details.age' => 'nullable|integer|min:0',
+            // 'details.age' => 'nullable|integer|min:0',
+            'details.date' => 'nullable',
+
             'details.gender' => 'nullable|string|in:Masculin,Feminin,other',
             'details.avatar_url' => 'nullable|url',
             'details.bio' => 'nullable|string|max:1000',
@@ -63,7 +65,9 @@ class UpdateProfileRequest extends FormRequest
         return [
             'phone_number.unique' => 'Le numéro de téléphone doit être unique.',
             'details.email.unique' => 'L\'email doit être unique.',
-            'details.age.required' => 'L\'âge est requis.',
+            // 'details.age.required' => 'L\'âge est requis.',
+            'details.date.required' => 'La date est requise.',
+
             'details.gender.required' => 'Le genre est requis.',
             'details.gender.in' => 'Le genre doit être l\'un des suivants : male, female, other.',
             'details.avatar_url.url' => 'L\'URL de l\'avatar doit être valide.',

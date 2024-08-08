@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CandidatureController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\DetailServiceController;
 use App\Http\Controllers\ProfilController;
@@ -21,14 +22,16 @@ Route::apiResource('/roles', RoleController::class);
 Route::post('/send-otp', [SignController::class, 'sendOtp']);
 Route::post('/verify-otp', [SignController::class, 'verifyOtp']);
 Route::apiResource('/profile', ProfilController::class);
+Route::apiResource('/candidature', CandidatureController::class);
+
 Route::get('/detailservice/{id}', [DetailServiceController::class,'show']);
 Route::delete('/profile/{userId}/image', [ProfilController::class, 'deleteImage']);
+Route::apiResource('/services', ServiceController::class);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::apiResource('/services', ServiceController::class);
     Route::post('/update-phone-number', [UserController::class, 'updatePhoneNumber']);
     Route::get('/{userId}/services', [ServiceController::class, 'userServices']);
 

@@ -29,4 +29,8 @@ class Service extends Model
 {
     return $this->hasOne(Detail::class);
 }
+public function candidatures()
+{
+    return $this->hasMany(Candidature::class);
+}
 }

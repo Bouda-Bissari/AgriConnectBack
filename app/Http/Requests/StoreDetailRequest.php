@@ -23,7 +23,8 @@ class StoreDetailRequest extends FormRequest
     {
         return [
             'user_id' => 'required|exists:users,id',
-            'age' => 'required|integer',
+            // 'age' => 'required|integer',
+            'date' => 'required|date',
             'email' => 'required|string|email|max:255',
             'gender' => 'required|string',
             'avatar_url' => 'nullable|string',

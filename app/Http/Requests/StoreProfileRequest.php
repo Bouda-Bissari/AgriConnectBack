@@ -32,7 +32,8 @@ class StoreProfileRequest extends FormRequest
             // Règles pour les attributs de Detail
             'details' => 'required|array',
             'details.email' => 'required|email|unique:details,email',
-            'details.age' => 'required|integer|min:0',
+            // 'details.age' => 'required|integer|min:0',
+            'details.date' => 'required|date',
             'details.gender' => 'required|string|in:male,female,other', // Exemples: male, female, other
             'details.avatar_url' => 'nullable|url',
             'details.bio' => 'nullable|string|max:1000',
@@ -56,7 +57,9 @@ class StoreProfileRequest extends FormRequest
             'password.required' => 'Le mot de passe est requis.',
             'details.email.required' => 'L\'adresse e-mail est requise.',
             'details.email.unique' => 'L\'adresse e-mail est déjà utilisée.',
-            'details.age.required' => 'L\'âge est requis.',
+            // 'details.age.required' => 'L\'âge est requis.',
+            'details.date.required' => 'L\'date est requise.',
+
             'details.gender.required' => 'Le genre est requis.',
             'details.gender.in' => 'Le genre doit être l\'un des suivants : male, female, other.',
             'details.avatar_url.url' => 'L\'URL de l\'avatar doit être valide.',

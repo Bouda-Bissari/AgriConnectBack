@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('email')->unique()->nullable();
-            $table->integer('age')->nullable(); 
+            // $table->integer('age')->nullable(); 
+            $table->date('date')->nullable();
             $table->enum('gender', ['Masculin', 'Feminin']);
             $table->string('avatar_url')->nullable();
             $table->text('bio')->nullable(); 
