@@ -63,6 +63,7 @@ class AuthController extends Controller
             'message' => 'Utilisateur créé avec succès. Un OTP a été envoyé à votre numéro de téléphone.',
             'user' => $user,
             'token' => $token,
+            'role' => $role,
 
         ]);
 

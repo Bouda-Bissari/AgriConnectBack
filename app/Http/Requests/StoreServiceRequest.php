@@ -24,10 +24,9 @@ class StoreServiceRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'location' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'type' => 'required|in:work,material', 
-            'image_url' => 'nullable|url',
-            'user_id' => 'required|exists:users,id', 
-        ];
+            'service_type' => 'required|in:work,material', 
+            'image' => 'required|file|mimes:jpg,png,jpeg',        ];
     }
 }

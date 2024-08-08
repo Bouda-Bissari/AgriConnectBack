@@ -20,7 +20,6 @@ Route::apiResource('/roles', RoleController::class);
 
 Route::post('/send-otp', [SignController::class, 'sendOtp']);
 Route::post('/verify-otp', [SignController::class, 'verifyOtp']);
-Route::apiResource('/services', ServiceController::class);
 Route::apiResource('/profile', ProfilController::class);
 Route::get('/detailservice/{id}', [DetailServiceController::class,'show']);
 Route::delete('/profile/{userId}/image', [ProfilController::class, 'deleteImage']);
@@ -29,7 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::apiResource('/services', ServiceController::class);
     Route::post('/update-phone-number', [UserController::class, 'updatePhoneNumber']);
+    Route::get('/{userId}/services', [ServiceController::class, 'userServices']);
 
     Route::post('/update-user-role', [UserController::class, 'updateUserRole']);
 

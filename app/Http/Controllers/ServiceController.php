@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
@@ -32,18 +34,32 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request): JsonResponse
     {
-        // Validate and store the new service
+        // Vérifiez si l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return response()->json(['error' => 'User not authenticated']);
+        }
+    
+        // Validez et stockez le nouveau service
         $validated = $request->validated();
+    
+        // Créez le service avec les données validées
+        $service = new Service($validated);
+    
+        // Associez le service à l'utilisateur authentifié
+        $service->user_id = Auth::id(); // L'ID de l'utilisateur authentifié
+            // Gestion du fichier image
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('images', 'public');
+        $service->image = $imagePath;
+    }
 
-        // Create the service with the validated data
-        $service = Service::create($validated);
-
+        $service->save();
+    
         return response()->json([
             'message' => 'Service created successfully',
             'service' => $service
         ], 201);
     }
-
     /**
      * Display the specified resource.
      */
@@ -76,6 +92,24 @@ class ServiceController extends Controller
             'message' => 'Service updated successfully',
             'service' => $service
         ]);
+    }
+
+
+    public function userServices($userId): JsonResponse
+    {
+
+        $authenticatedUser = Auth::user();
+
+        // Vérifiez que l'utilisateur connecté demande ses propres services
+        if ($authenticatedUser->id !== (int)$userId) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        // Fetch the user by ID
+        $user = User::findOrFail($userId);
+
+        // Get all services associated with the user
+        $services = $user->services; 
+        return response()->json($services);
     }
 
     /**
