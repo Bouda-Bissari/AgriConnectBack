@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('phone_number_confirmed')->nullable();
             $table->boolean('is_blocked')->default(false);
             $table->boolean('is_active')->default(false);
+            $table->boolean('is_completed')->default(false);
             $table->boolean('two_factor_enable')->default(false);
             $table->timestamp('phone_number_verified_at')->nullable();
             $table->string('password');

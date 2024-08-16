@@ -76,29 +76,53 @@ class AuthController extends Controller
 
 
 
+    // public function login(LoginRequest $request)
+    // {
+    //     $credentials = $request->validated();
+    //     if (!Auth::attempt($credentials)) {
+    //         return response(
+    //             [
+    //                 'message' => 'Mauvais numero ou mot de passe'
+    //             ]
+    //         );
+    //     }
+    //     /** @var User $user */
+    //     $user = Auth::user();
+    //     $token = $user->createToken('user')->plainTextToken;
+
+    //     $role = $user->roles()->first()->name;
+
+    //     return response()->json([
+    //         'user' => $user,
+    //         'token' => $token,
+    //         'role' => $role,
+    //     ]);
+
+    // }
     public function login(LoginRequest $request)
-    {
-        $credentials = $request->validated();
-        if (!Auth::attempt($credentials)) {
-            return response(
-                [
-                    'message' => 'Mauvais numero ou mot de passe'
-                ]
-            );
-        }
-        /** @var User $user */
-        $user = Auth::user();
-        $token = $user->createToken('user')->plainTextToken;
-
-        $role = $user->roles()->first()->name;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-            'role' => $role,
+{
+    $credentials = $request->validated();
+    if (!Auth::attempt($credentials)) {
+        return response([
+            'message' => 'Mauvais numéro ou mot de passe'
         ]);
-
     }
+
+    /** @var User $user */
+    $user = Auth::user();
+    $token = $user->createToken('user')->plainTextToken;
+
+    // Récupérer tous les rôles de l'utilisateur et les formater en chaîne
+    $roles = $user->roles->pluck('name');
+
+    return response()->json([
+        'user' => $user,
+        'token' => $token,
+        'roles' => $roles, 
+    ]);
+}
+
+    
 
 
     public function logout(Request $request)

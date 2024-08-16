@@ -23,6 +23,12 @@ Route::post('/send-otp', [SignController::class, 'sendOtp']);
 Route::post('/verify-otp', [SignController::class, 'verifyOtp']);
 Route::apiResource('/profile', ProfilController::class);
 Route::apiResource('/candidature', CandidatureController::class);
+//test
+Route::get('/candidatures/user/{userId}', [CandidatureController::class, 'getCandidaturesByUser']);
+Route::get('/candidatures/service/{serviceId}', [CandidatureController::class, 'getCandidaturesByService']);
+//pire tests
+Route::get('/candidatures/service-owner/{serviceOwnerId}', [CandidatureController::class, 'getCandidaturesByServiceOwner']);
+
 
 Route::get('/detailservice/{id}', [DetailServiceController::class,'show']);
 Route::delete('/profile/{userId}/image', [ProfilController::class, 'deleteImage']);

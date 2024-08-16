@@ -19,16 +19,16 @@ class DatabaseSeeder extends Seeder
     {
         RoleFactory::createRoles();
 
-        User::factory(10)->create();
+        User::factory(20)->create();
 
         // User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        Detail::factory(10)->create();
-        Service::factory(10)->create();
+        Detail::factory(20)->create();
+        Service::factory(20)->create();
 
-        Candidature::factory(10)->create();
+        Candidature::factory(20)->create();
 
     }
 }
