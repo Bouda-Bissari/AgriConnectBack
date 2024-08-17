@@ -66,6 +66,8 @@ class ProfilController extends Controller
     //     return response()->json(['error' => 'Unauthorized'], 403);
     // }
 
+    
+
     return response()->json($user);
 }
 
@@ -83,6 +85,10 @@ class ProfilController extends Controller
         
         // Mise à jour des informations de l'utilisateur
         $user->update($request->only(['fullName', 'phone_number']));
+
+ // Mise à jour de l'utilisateur authentifié
+// $userAuth = Auth::user();
+$user->update(['is_completed' => true]);
         
         // Récupérer ou créer les détails associés
         $details = $user->details;

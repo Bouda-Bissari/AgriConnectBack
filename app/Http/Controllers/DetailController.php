@@ -6,6 +6,7 @@ use App\Http\Requests\StoreDetailRequest;
 use App\Http\Requests\UpdateDetailRequest;
 use App\Models\Detail;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class DetailController extends Controller
 {
@@ -26,15 +27,30 @@ class DetailController extends Controller
      * @param StoreDetailRequest $request
      * @return JsonResponse
      */
+    // public function store(StoreDetailRequest $request): JsonResponse
+    // {
+    //     $validated = $request->validated();
+
+    //     // Création des détails
+    //     $detail = Detail::create($validated);
+
+    //     return response()->json(['message' => 'Detail Created', 'detail' => $detail], 201);
+    // }
+
     public function store(StoreDetailRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
+{
+    $validated = $request->validated();
 
-        // Création des détails
-        $detail = Detail::create($validated);
+    // Création des détails
+    $detail = Detail::create($validated);
 
-        return response()->json(['message' => 'Detail Created', 'detail' => $detail], 201);
-    }
+    // Mise à jour de l'utilisateur authentifié
+    $user = Auth::user();
+    $user->is_completed = true;
+
+    return response()->json(['message' => 'Detail Created', 'detail' => $detail], 201);
+}
+
 
     /**
      * Display the specified resource.
@@ -60,6 +76,10 @@ class DetailController extends Controller
 
         // Mise à jour des attributs des détails
         $detail->update($validated);
+
+        // Mise à jour de l'utilisateur authentifié
+    $user = Auth::user();
+    $user->is_completed = true;
 
         return response()->json(['message' => 'Detail Updated', 'detail' => $detail]);
     }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->text('message')->nullable();
-            $table->boolean('status')->default(true);
+            $table->enum('status', ['pending', 'accepted', 'rejected','canceled'])->default('pending');
             $table->timestamps();
         });
     }

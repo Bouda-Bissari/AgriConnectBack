@@ -26,6 +26,20 @@ Route::apiResource('/candidature', CandidatureController::class);
 //test
 Route::get('/candidatures/user/{userId}', [CandidatureController::class, 'getCandidaturesByUser']);
 Route::get('/candidatures/service/{serviceId}', [CandidatureController::class, 'getCandidaturesByService']);
+
+// Route pour changer le statut d'une candidature
+Route::put('/candidatures/{id}/status', [CandidatureController::class, 'changeStatus']);
+
+// Route pour compter le nombre de candidatures pour un service spécifique
+Route::get('/candidatures/count/{serviceId}', [CandidatureController::class, 'countCandidaturesByService']);
+
+// Route pour récupérer toutes les candidatures avec un statut "pending"
+Route::get('/candidatures/pending', [CandidatureController::class, 'getPendingCandidatures']);
+
+// Route pour filtrer les candidatures selon différents critères
+Route::get('/candidatures/filter', [CandidatureController::class, 'filterCandidatures']);
+
+
 //pire tests
 Route::get('/candidatures/service-owner/{serviceOwnerId}', [CandidatureController::class, 'getCandidaturesByServiceOwner']);
 
@@ -40,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/update-phone-number', [UserController::class, 'updatePhoneNumber']);
     Route::get('/{userId}/services', [ServiceController::class, 'userServices']);
+
+    Route::apiResource('/candidature', CandidatureController::class);
+
 
     Route::post('/update-user-role', [UserController::class, 'updateUserRole']);
 
