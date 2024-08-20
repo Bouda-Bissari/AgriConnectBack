@@ -25,6 +25,7 @@ class StoreServiceRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'location' => 'nullable|string',
+            'deadline' => 'required|string',
             'price' => 'required|numeric|min:0',
             'service_type' => 'required|in:work,material', 
             'image' => 'required|file|mimes:jpg,png,jpeg',        ];

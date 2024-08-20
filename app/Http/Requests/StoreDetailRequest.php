@@ -27,7 +27,7 @@ class StoreDetailRequest extends FormRequest
             'date' => 'required|date',
             'email' => 'required|string|email|max:255',
             'gender' => 'required|string',
-            'avatar_url' => 'nullable|string',
+            'image' => 'nullable|string',
             'bio' => 'nullable|string',
             'company_name' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',

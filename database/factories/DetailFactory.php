@@ -32,7 +32,7 @@ class DetailFactory extends Factory
             // 'age' => $this->faker->numberBetween(18, 99),
             'date' => $this->faker->dateTimeBetween('now', '+1 year'), 
             'gender' => $this->faker->randomElement(['Masculin', 'Feminin']),
-            'avatar_url' => 'https://picsum.photos/200/300',
+            'image' => 'https://picsum.photos/200/300',
             'bio' => $this->faker->paragraph(),
             'company_name' => $this->faker->company(),
             'address' => $this->faker->streetAddress(),

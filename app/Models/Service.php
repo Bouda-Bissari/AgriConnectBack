@@ -33,4 +33,9 @@ public function candidatures()
 {
     return $this->hasMany(Candidature::class);
 }
+public function reports()
+{
+    return $this->hasMany(Report::class);
+}
+
 }

@@ -131,7 +131,7 @@ class CandidatureController extends Controller
     {
         $candidature = Candidature::findOrFail($id);
         $validatedData = $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
+            'status' => 'required|in:pending,accepted,rejected,canceled',
         ]);
 
         $candidature->status = $validatedData['status'];

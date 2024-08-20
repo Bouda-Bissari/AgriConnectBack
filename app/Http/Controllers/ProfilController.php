@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProfileRequest;
-use App\Http\Requests\UpdateProfileRequest;
+//use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdatePhoneRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\ProfileResource;
 use App\Models\Detail;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProfilController extends Controller
@@ -22,7 +24,7 @@ class ProfilController extends Controller
      */
     public function index(): JsonResponse
     {
-        $profiles = User::with('details')->get();
+        $profiles = User::with('details','roles')->get();
         return response()->json(($profiles));
     }
 
@@ -34,6 +36,8 @@ class ProfilController extends Controller
      */
     public function store(StoreProfileRequest $request): JsonResponse
     {
+        dd($request);
+
         $validated = $request->validated();
 
         $user = User::create([
@@ -66,65 +70,72 @@ class ProfilController extends Controller
     //     return response()->json(['error' => 'Unauthorized'], 403);
     // }
 
-    
+
 
     return response()->json($user);
 }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param UpdateProfileRequest $request
-     * @param User $user
-     * @return JsonResponse
-     */
-    public function update(UpdateProfileRequest $request, $userId)
-    {
-        // Récupérer l'utilisateur par son ID
-        $user = User::findOrFail($userId);
-        
-        // Mise à jour des informations de l'utilisateur
-        $user->update($request->only(['fullName', 'phone_number']));
 
- // Mise à jour de l'utilisateur authentifié
-// $userAuth = Auth::user();
-$user->update(['is_completed' => true]);
-        
-        // Récupérer ou créer les détails associés
-        $details = $user->details;
-        
-        if (!$details) {
-            $details = new Detail();
-            $details->user_id = $user->id;
-        }
-        
-        // Mise à jour des détails
-        $details->fill($request->only([
-            'email',
-            'date',
-            'gender',
-            'bio',
-            'company_name',
-            'address',
-            'domaine'
-        ]));
-        $details->save();
-        
-        // Gérer la mise à jour de l'image si nécessaire
-        if ($request->hasFile('avatar_url')) {
-            $file = $request->file('avatar_url');
-            $filePath = $file->store('avatars', 'public');
-            $user->avatar_url = $filePath;
-            $user->save();
-        }
-        
-        return response()->json([
-            'message' => 'Profil mis à jour avec succès',
-            'details' => $details,
-            'request' => $request->all()
-        ]);
+public function update(Request $request, $userId): JsonResponse
+{
+    dd($request);
+    // dd($request->file('image'));
+    // dd($request->input('data'));
+
+
+    // return response()->json($request->all());
+    // Récupérer l'utilisateur par son ID
+    $user = User::findOrFail($userId);
+
+    // Mise à jour des informations de l'utilisateur
+    $user->update($request->only(['fullName', 'phone_number']));
+
+    // Mettre à jour le statut du profil
+    $user->update(['is_completed' => true]);
+
+    // Récupérer ou créer les détails associés
+    $details = $user->details;
+
+    if (!$details) {
+        $details = new Detail();
+        $details->user_id = $user->id;
     }
-    
+
+    $details->update($request->only([
+        'email',
+        'date',
+        'gender',
+        'bio',
+        'company_name',
+        'address',
+        'domaine',
+
+    ]));
+
+    // Gérer l'image
+    if ($request->hasFile('image')) {
+        // Enregistrer la nouvelle image
+        $imagePath = $request->file('image')->store('images', 'public');
+        $details->image = $imagePath;
+    }
+
+
+
+
+    // Les reponses (utile)
+    return response()->json([
+        'message' => 'Profil mis à jour avec succès',
+        'details' => $details,
+        'image'=>$details->image,
+        'completed' => $user->is_completed,
+    ]);
+}
+
+
+
+
+
+
 
 
 // public function update(UpdateProfileRequest $request, $userId): JsonResponse
@@ -158,10 +169,10 @@ $user->update(['is_completed' => true]);
 //         'domaine'
 //     ]));
 
-//     if ($request->hasFile('avatar_url')) {
-//         $file = $request->file('avatar_url');
+//     if ($request->hasFile('image')) {
+//         $file = $request->file('image');
 //         $filePath = $file->store('avatars', 'public');
-//         $user->avatar_url = $filePath;
+//         $user->image = $filePath;
 //         $user->save();
 //     }
 
@@ -171,8 +182,8 @@ $user->update(['is_completed' => true]);
 //         "request" => $request->all()
 //     ]);
 // }
-    
-    
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -183,7 +194,7 @@ $user->update(['is_completed' => true]);
     public function destroy(User $user): JsonResponse
     {
         $user->details()->delete();
-        $user->delete(); 
+        $user->delete();
 
         return response()->json(['message' => 'Profile Deleted']);
     }

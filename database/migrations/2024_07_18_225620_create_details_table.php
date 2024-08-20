@@ -18,7 +18,7 @@ return new class extends Migration
             // $table->integer('age')->nullable(); 
             $table->date('date')->nullable();
             $table->enum('gender', ['Masculin', 'Feminin']);
-            $table->string('avatar_url')->nullable();
+            $table->string('image')->nullable();
             $table->text('bio')->nullable(); 
             $table->string('address')->nullable();
             $table->enum('domaine', [

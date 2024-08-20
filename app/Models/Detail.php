@@ -9,7 +9,7 @@ class Detail extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','email','date','gender','avatar_url','bio','company_name','address','domaine'];
+    protected $fillable = ['user_id','email','date','gender','image','bio','company_name','address','domaine'];
 
     public function user()
     {

@@ -6,8 +6,11 @@ use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ServiceController extends Controller
 {
@@ -38,15 +41,15 @@ class ServiceController extends Controller
         if (!Auth::check()) {
             return response()->json(['error' => 'User not authenticated']);
         }
-    
+
         // Validez et stockez le nouveau service
         $validated = $request->validated();
-    
+
         // Créez le service avec les données validées
         $service = new Service($validated);
-    
+
         // Associez le service à l'utilisateur authentifié
-        $service->user_id = Auth::id(); // L'ID de l'utilisateur authentifié
+        $service->user_id = Auth::id();
             // Gestion du fichier image
     if ($request->hasFile('image')) {
         $imagePath = $request->file('image')->store('images', 'public');
@@ -54,12 +57,13 @@ class ServiceController extends Controller
     }
 
         $service->save();
-    
+
         return response()->json([
             'message' => 'Service created successfully',
             'service' => $service
         ], 201);
     }
+
     /**
      * Display the specified resource.
      */
@@ -108,9 +112,73 @@ class ServiceController extends Controller
         $user = User::findOrFail($userId);
 
         // Get all services associated with the user
-        $services = $user->services; 
+        $services = $user->services;
         return response()->json($services);
     }
+
+
+    //recuperer le nombre associer a une candidature
+
+    public function countApplications($serviceId): JsonResponse
+    {
+        // Valider que l'ID du service est un entier et existe dans la base de données
+        $validated = Validator::make(
+            ['service_id' => $serviceId],
+            ['service_id' => 'required|integer|exists:services,id']
+        );
+
+        if ($validated->fails()) {
+            return response()->json(['error' => 'Invalid service ID'], 400);
+        }
+
+        // Trouvez le service par ID
+        $service = Service::findOrFail($serviceId);
+
+
+                // Vérifiez si l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        // Obtenez le nombre de candidatures associées au service
+        $count = $service->candidatures()->count();
+
+        return response()->json([
+            'service_id' => $service->id,
+            'applications_count' => $count
+        ]);
+    }
+
+
+//recupere les candidatures associes
+public function getApplications($serviceId): JsonResponse
+{
+    // Valider que l'ID du service est un entier et existe dans la base de données
+    $validated = Validator::make(
+        ['service_id' => $serviceId],
+        ['service_id' => 'required|integer|exists:services,id']
+    );
+
+    if ($validated->fails()) {
+        return response()->json(['error' => 'Invalid service ID'], 400);
+    }
+
+    // Trouvez le service par ID
+    $service = Service::findOrFail($serviceId);
+
+    // Vérifiez si l'utilisateur est authentifié
+    if (!Auth::check()) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    // Obtenez les candidatures associées au service
+    $applications = $service->candidatures;
+
+    return response()->json([
+        'service_id' => $service->id,
+        'applications' => $applications
+    ]);
+}
 
     /**
      * Remove the specified resource from storage.

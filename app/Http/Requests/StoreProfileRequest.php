@@ -35,7 +35,7 @@ class StoreProfileRequest extends FormRequest
             // 'details.age' => 'required|integer|min:0',
             'details.date' => 'required|date',
             'details.gender' => 'required|string|in:male,female,other', // Exemples: male, female, other
-            'details.avatar_url' => 'nullable|url',
+            'details.image' => 'nullable|url',
             'details.bio' => 'nullable|string|max:1000',
             'details.company_name' => 'nullable|string|max:255',
             'details.address' => 'nullable|string|max:255',
@@ -62,7 +62,7 @@ class StoreProfileRequest extends FormRequest
 
             'details.gender.required' => 'Le genre est requis.',
             'details.gender.in' => 'Le genre doit être l\'un des suivants : male, female, other.',
-            'details.avatar_url.url' => 'L\'URL de l\'avatar doit être valide.',
+            'details.image.url' => 'L\'URL de l\'avatar doit être valide.',
             'details.bio.max' => 'La biographie ne peut pas dépasser 1000 caractères.',
             'details.company_name.max' => 'Le nom de la société ne peut pas dépasser 255 caractères.',
             'details.address.max' => 'L\'adresse ne peut pas dépasser 255 caractères.',
