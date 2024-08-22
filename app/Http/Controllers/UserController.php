@@ -117,13 +117,16 @@ class UserController extends Controller
         return response()->json(['message' => 'User Deleted']);
     }
 
-    public function updatePhoneNumber(UpdatePhoneRequest $request, User $user)
+    public function updatePhoneNumber(UpdatePhoneRequest $request, $userId)
     {
         $validated = $request->validated();
 
+        // return response()->json($request->input('phone_number'));
+
+        $user = User::findOrFail($userId);
         // Mise à jour du numéro de téléphone
         $user->update([
-            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
+            'phone_number' => $request->input('phone_number'),
         ]);
 
         // Envoyer l'OTP
@@ -173,17 +176,17 @@ class UserController extends Controller
 
 
     //      $role = Role::where('name', $request->role)->first();
- 
+
     //      if (!$role) {
     //          return response()->json(['error' => 'Invalid role'], 400);
     //      }
- 
+
     //             // Mettre à jour le rôle de l'utilisateur
     //             UserRole::updateOrCreate(
     //                 ['user_id' => $user->id],
     //                 ['role_id' => $role->id]
     //             );
- 
+
     //      return response()->json(['message' => 'Role updated successfully'], 200);
     // }
 

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->decimal('price', 8, 2)->nullable();
             $table->string('image')->nullable();
+            $table->boolean('deleted')->default(false);
+
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

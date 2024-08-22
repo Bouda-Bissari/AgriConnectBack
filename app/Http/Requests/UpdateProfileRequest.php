@@ -25,24 +25,24 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         $userId = $this->route('profile');
-
+        $detail = $this->route('detail');
         return [
             'phone_number' => [
                 'nullable',
                 'string',
                 'max:15',
                 Rule::unique('users', 'phone_number')->ignore($userId),
+
             ],
             'fullName' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
+// 'email' => [
+//     'nullable',
+//     'email',
+//     Rule::unique('details', 'email')->ignore($detail->id),
+// ],
 
-            'email' => [
-                'nullable',
-                'email',
-
-            ],
-
-            'date' => 'nullable',
+                     'date' => 'nullable',
             'gender' => 'nullable|string|in:Masculin,Feminin,other',
             'image' => 'nullable|file|mimes:jpg,png,jpeg',
             'bio' => 'nullable|string|max:1000',
@@ -61,13 +61,12 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'phone_number.unique' => 'Le numéro de téléphone doit être unique.',
-            'email.unique' => 'L\'email doit être unique.',
+            'email.email' => 'L\'email doit être valide.',
             'date.required' => 'La date est requise.',
             'gender.required' => 'Le genre est requis.',
             'gender.in' => 'Le genre doit être l\'un des suivants : Masculin, Féminin, autre.',
-            'image.image' => 'Le fichier doit être une image.',
-            'image.mimes' => 'L\'image doit être de type : jpeg, png, jpg, ou gif.',
-            'image.max' => 'L\'image ne peut pas dépasser 2048 Ko.',
+            'image.file' => 'Le fichier doit être une image.',
+            'image.mimes' => 'L\'image doit être de type : jpeg, png, jpg.',
             'bio.max' => 'La biographie ne peut pas dépasser 1000 caractères.',
             'company_name.max' => 'Le nom de la société ne peut pas dépasser 255 caractères.',
             'address.max' => 'L\'adresse ne peut pas dépasser 255 caractères.',
@@ -75,4 +74,3 @@ class UpdateProfileRequest extends FormRequest
         ];
     }
 }
-

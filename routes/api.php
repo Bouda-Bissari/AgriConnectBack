@@ -21,7 +21,9 @@ Route::apiResource('/roles', RoleController::class);
 
 Route::post('/send-otp', [SignController::class, 'sendOtp']);
 Route::post('/verify-otp', [SignController::class, 'verifyOtp']);
-Route::apiResource('/profile', ProfilController::class);
+// Route::post('/profile-update/{ptofile}', [ProfilController::class,'save']);
+
+
 Route::apiResource('/candidature', CandidatureController::class);
 //test
 Route::get('/candidatures/user/{userId}', [CandidatureController::class, 'getCandidaturesByUser']);
@@ -59,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::apiResource('/profile', ProfilController::class);
 
 
 //services
@@ -79,7 +82,7 @@ Route::get('/services/{service}/get-applications', [ServiceController::class, 'g
     Route::apiResource('/reports', ReportController::class);
 
 
-    Route::post('/update-phone-number', [UserController::class, 'updatePhoneNumber']);
+    Route::post('/update-phone-number/{userId}', [UserController::class, 'updatePhoneNumber']);
     Route::get('/{userId}/services', [ServiceController::class, 'userServices']);
 
     Route::apiResource('/candidature', CandidatureController::class);

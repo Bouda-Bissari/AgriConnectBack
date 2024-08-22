@@ -81,6 +81,13 @@ class ServiceController extends Controller
         // Not needed for API, typically used for forms in traditional apps
     }
 
+    public function test(Request $request, $profile ){
+        dd($request->all(), $request->file('image'));
+
+        return response()->json($request->all());
+    }
+
+
     /**
      * Update the specified resource in storage.
      */

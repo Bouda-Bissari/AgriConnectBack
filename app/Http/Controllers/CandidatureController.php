@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Notifications\CandidatureNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -39,8 +40,8 @@ class CandidatureController extends Controller
         $user = User::find($userId);
         $roles = $user->roles()->pluck('name');
 
-        if (!$roles->contains('postulant')) {
-            $postulantRole = Role::where('name', 'postulant')->first();
+        if (!$roles->contains('ouvrier')) {
+            $postulantRole = Role::where('name', 'ouvrier')->first();
             if ($postulantRole) {
                 UserRole::updateOrCreate(
                     ['user_id' => $userId],
@@ -49,14 +50,27 @@ class CandidatureController extends Controller
             }
         }
 
+        // Créer la candidature
         $candidature = Candidature::create([
             'user_id' => $userId,
             'service_id' => $validatedData['service_id'],
             'message' => $validatedData['message'],
         ]);
 
+        // Charger les relations pour accéder au titre du service
+        $candidature->load('service');
+
+        // Préparer les détails de la notification, incluant le titre du service
+        $details = [
+            'body' => 'Vous avez postulé avec succès à la candidature pour le service: ' . $candidature->service->title,
+            'url' => url('/candidatures/' . $candidature->id)
+        ];
+
+        // Envoyer la notification
+        $user->notify(new CandidatureNotification($details));
+
         return response()->json([
-            'message' => 'Candidature créée avec succès',
+            'message' => 'Candidature soumise avec succès et notification envoyée!',
             'candidature' => $candidature
         ], 201);
     }
@@ -110,6 +124,8 @@ class CandidatureController extends Controller
         $candidature->update([
             'message' => $request->input('message'),
         ]);
+
+
 
         return response()->json([
             'message' => 'Candidature mise à jour avec succès',

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ProfilController extends Controller
 {
@@ -76,16 +77,13 @@ class ProfilController extends Controller
 }
 
 
-public function update(Request $request, $userId): JsonResponse
+
+public function update(UpdateProfileRequest $request, $userId): JsonResponse
 {
-    dd($request);
-    // dd($request->file('image'));
-    // dd($request->input('data'));
 
 
-    // return response()->json($request->all());
     // Récupérer l'utilisateur par son ID
-    $user = User::findOrFail($userId);
+    $user = User::with('details')->findOrFail($userId);
 
     // Mise à jour des informations de l'utilisateur
     $user->update($request->only(['fullName', 'phone_number']));
@@ -101,7 +99,8 @@ public function update(Request $request, $userId): JsonResponse
         $details->user_id = $user->id;
     }
 
-    $details->update($request->only([
+    // Mettre à jour les détails
+    $details->fill($request->only([
         'email',
         'date',
         'gender',
@@ -109,27 +108,26 @@ public function update(Request $request, $userId): JsonResponse
         'company_name',
         'address',
         'domaine',
-
     ]));
+    $details->save();
 
     // Gérer l'image
     if ($request->hasFile('image')) {
         // Enregistrer la nouvelle image
         $imagePath = $request->file('image')->store('images', 'public');
         $details->image = $imagePath;
+        $details->save();  // Assurez-vous que les modifications sont enregistrées
     }
 
-
-
-
-    // Les reponses (utile)
+    // Les réponses (utile)
     return response()->json([
         'message' => 'Profil mis à jour avec succès',
         'details' => $details,
-        'image'=>$details->image,
+        'image' => $details->image,
         'completed' => $user->is_completed,
     ]);
 }
+
 
 
 

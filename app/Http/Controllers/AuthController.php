@@ -15,6 +15,7 @@ class AuthController extends Controller
 {
 
 
+
     // public function register(RegisterRequest $request)
     // {
     //     $data = $request->validated();
@@ -25,7 +26,7 @@ class AuthController extends Controller
     //     // Ajouter le code pays 228 si ce n'est pas déjà présent
     //     $phoneNumber = $request->phone_number;
     //     $phoneNumber = '228' . $phoneNumber;
-    
+
 
     //     $user = User::create([
     //         'phone_number' => $data['phone_number'],
@@ -77,46 +78,46 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $data = $request->validated();
-    
+
         // Validation du numéro de téléphone
         $phoneNumber = $data['phone_number'];
         if (!preg_match('/^\d{8,}$/', $phoneNumber)) {
             return response()->json(['error' => 'Le numéro de téléphone est invalide.'], 400);
         }
-    
+
         // Ajouter le code pays 228 si ce n'est pas déjà présent
         $phoneNumber = $phoneNumber[0] === '2' ? $phoneNumber : '228' . $phoneNumber;
-    
+
         // Créez l'utilisateur
         $user = User::create([
             'phone_number' => $phoneNumber,
             'fullName' => $data['fullName'],
             'password' => bcrypt($data['password']),
         ]);
-    
+
         $token = $user->createToken('main')->plainTextToken;
-    
+
         // Assigner le rôle à l'utilisateur
         $role = Role::where('name', $data['role'])->first();
-    
+
         if (!$role) {
             return response()->json(['error' => 'Rôle invalide'], 400);
         }
-    
+
         // Associer le rôle à l'utilisateur
         UserRole::updateOrCreate(
             ['user_id' => $user->id],
             ['role_id' => $role->id]
         );
-    
+
         // Envoyer l'OTP
         $otpRequest = new Request([
             'phone_number' => $phoneNumber,
         ]);
-    
+
         $otpController = new SignController();
         $otpController->sendOtp($otpRequest);
-    
+
         return response()->json([
             'message' => 'Utilisateur créé avec succès. Un OTP a été envoyé à votre numéro de téléphone.',
             'user' => $user,
@@ -124,7 +125,7 @@ class AuthController extends Controller
             'role'  => $role->name,
         ]);
     }
-    
+
 
 
 
@@ -174,11 +175,11 @@ class AuthController extends Controller
     return response()->json([
         'user' => $user,
         'token' => $token,
-        'roles' => $roles, 
+        'roles' => $roles,
     ]);
 }
 
-    
+
 
 
     public function logout(Request $request)

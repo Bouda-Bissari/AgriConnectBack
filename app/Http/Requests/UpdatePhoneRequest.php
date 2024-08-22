@@ -23,7 +23,7 @@ class UpdatePhoneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number' => ['required','string','digits:11','max:255',Rule::unique('users')->ignore($this->route('user'))], 
+            'phone_number' => ['required','string','digits:11','max:255',Rule::unique('users')->ignore($this->route('user'))],
         ];
     }
 }
