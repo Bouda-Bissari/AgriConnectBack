@@ -123,6 +123,7 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token,
             'role'  => $role->name,
+            'is_completed' => $user->is_completed,
         ]);
     }
 
@@ -176,6 +177,7 @@ class AuthController extends Controller
         'user' => $user,
         'token' => $token,
         'roles' => $roles,
+        'is_completed' => $user->is_completed,
     ]);
 }
 

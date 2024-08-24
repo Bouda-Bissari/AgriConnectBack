@@ -26,7 +26,7 @@ class UpdateServiceRequest extends FormRequest
             'description' => 'sometimes|nullable|string',
             'price' => 'sometimes|required|numeric|min:0',
             'type' => 'sometimes|required|in:work,material',
-            'image_url' => 'sometimes|nullable|url',
+            'image' => 'sometimes|nullable|file',
         ];
     }
 }

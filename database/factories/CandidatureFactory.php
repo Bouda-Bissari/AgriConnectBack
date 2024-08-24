@@ -19,10 +19,15 @@ class CandidatureFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,  
+            'user_id' => User::inRandomOrder()->first()->id,
+            // 'user_id' => User::factory(),
             'service_id' => Service::inRandomOrder()->first()->id,
-            'message' => $this->faker->paragraph, 
-            'status' => $this->faker->boolean, 
+            'message' => $this->faker->paragraph,
+            // 'status' => $this->faker->boolean,
+            'status' => $this->faker->randomElement([
+                'pending', 'accepted', 'rejected','canceled','deleted'
+            ]),
+
         ];
     }
 }

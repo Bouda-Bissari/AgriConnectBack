@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CandidatureController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\DetailServiceController;
+use App\Http\Controllers\NotificationCandidatureController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -64,9 +65,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/profile', ProfilController::class);
 
 
+    Route::get('/notifications', [NotificationCandidatureController::class, 'index']);
+    Route::get('/notifications/{id}', [NotificationCandidatureController::class, 'show']);
+    Route::post('/notifications/{id}/markAsRead', [NotificationCandidatureController::class, 'update']);
+    Route::delete('/notifications/{id}', [NotificationCandidatureController::class, 'destroy']);
+
 //services
 // Route pour créer un nouveau service (store)
 Route::post('/services', [ServiceController::class, 'store']);
+
+Route::patch('/service/{service}/update-deleted-status', [ServiceController::class, 'updateDeletedStatus']);
 
 
 // Route pour mettre à jour un service spécifique (update)

@@ -23,11 +23,11 @@ class StoreServiceRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'location' => 'nullable|string',
-            'deadline' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'service_type' => 'required|in:work,material', 
-            'image' => 'required|file|mimes:jpg,png,jpeg',        ];
+            'description' => 'required|string',
+            'location' => 'required|string',
+            'deadline' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'service_type' => 'required|in:work,material',
+            'image' => 'nullable|file|mimes:jpg,png,jpeg',        ];
     }
 }

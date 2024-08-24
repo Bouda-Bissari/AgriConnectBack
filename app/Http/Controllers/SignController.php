@@ -49,7 +49,7 @@ class SignController extends Controller
 
         if ($user) {
             // Update the is_blocked status to false
-            $user->is_blocked = true;
+            $user->is_blocked = false;
             $user->save();
 
             return response()->json(['message' => 'Compte activé avec succès.']);

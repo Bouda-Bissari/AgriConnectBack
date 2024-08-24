@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('email')->unique()->nullable();
-            // $table->integer('age')->nullable(); 
+            $table->string('email')->nullable();
+            // $table->integer('age')->nullable();
             $table->date('date')->nullable();
             $table->enum('gender', ['Masculin', 'Feminin']);
             $table->string('image')->nullable();
-            $table->text('bio')->nullable(); 
+            $table->text('bio')->nullable();
             $table->string('address')->nullable();
             $table->enum('domaine', [
                 'Culture de céréales',
@@ -43,7 +43,7 @@ return new class extends Migration
                 'Consultation en agriculture',
                 'Vente de produits agricoles',
                 'Formation agricole',
-            ]);         
+            ]);
                $table->string('company_name')->nullable();
             $table->timestamps();
         });

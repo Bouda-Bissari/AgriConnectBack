@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
@@ -19,8 +20,7 @@ class ServiceController extends Controller
      */
     public function index(): JsonResponse
     {
-        // Fetch all services with optional filtering, sorting, etc.
-        $services = Service::all();
+        $services = Service::where('deleted', false)->get();
         return response()->json($services);
     }
 
@@ -69,9 +69,41 @@ class ServiceController extends Controller
      */
     public function show(Service $service): JsonResponse
     {
-        // Return the specific service
+        // Vérifiez si le service est marqué comme supprimé
+        if ($service->deleted) {
+            return response()->json(['error' => 'Service not found'], 404);
+        }
+
+        // Retournez le service s'il n'est pas supprimé
         return response()->json($service);
     }
+
+
+    /**
+ * Update the 'deleted' status of the specified resource.
+ */
+public function updateDeletedStatus(Request $request, Service $service): JsonResponse
+{
+    // Vérifiez si l'utilisateur est authentifié
+    if (!Auth::check()) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    // Valider que la valeur de 'deleted' est un booléen
+    $request->validate([
+        'deleted' => 'required|boolean',
+    ]);
+
+    // Mettre à jour la colonne 'deleted'
+    $service->deleted = $request->input('deleted');
+    $service->save();
+
+    return response()->json([
+        'message' => 'Service deleted status updated successfully',
+        'service' => $service
+    ]);
+}
+
 
     /**
      * Show the form for editing the specified resource.
@@ -81,11 +113,7 @@ class ServiceController extends Controller
         // Not needed for API, typically used for forms in traditional apps
     }
 
-    public function test(Request $request, $profile ){
-        dd($request->all(), $request->file('image'));
 
-        return response()->json($request->all());
-    }
 
 
     /**
@@ -93,11 +121,29 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service): JsonResponse
     {
-        // Validate and update the service
+        // Vérifiez si l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        // Validation des données
         $validated = $request->validated();
 
-        // Update the service with the validated data
+        // Mettez à jour les champs valides
         $service->update($validated);
+
+        // Gestion du fichier image
+        if ($request->hasFile('image')) {
+            // Supprimez l'ancienne image si elle existe
+            if ($service->image) {
+                Storage::disk('public')->delete($service->image);
+            }
+
+            // Stockez la nouvelle image
+            $imagePath = $request->file('image')->store('images', 'public');
+            $service->image = $imagePath;
+            $service->save();
+        }
 
         return response()->json([
             'message' => 'Service updated successfully',
@@ -106,20 +152,22 @@ class ServiceController extends Controller
     }
 
 
+
     public function userServices($userId): JsonResponse
     {
-
         $authenticatedUser = Auth::user();
 
         // Vérifiez que l'utilisateur connecté demande ses propres services
         if ($authenticatedUser->id !== (int)$userId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
+
         // Fetch the user by ID
         $user = User::findOrFail($userId);
 
-        // Get all services associated with the user
-        $services = $user->services;
+        // Get all services associated with the user and filter out the deleted ones
+        $services = $user->services()->where('deleted', false)->get();
+
         return response()->json($services);
     }
 

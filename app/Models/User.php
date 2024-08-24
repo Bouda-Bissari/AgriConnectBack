@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\DatabaseNotification;
 
 class User extends Authenticatable
 {
@@ -23,7 +24,14 @@ class User extends Authenticatable
         'password',
         'is_completed',
     ];
-    
+
+
+
+    public function routeNotificationForMail()
+    {
+        // Utilisation de la relation 'details' pour récupérer l'email
+        return $this->details->email;
+    }
 
     public function roles()
     {
@@ -70,5 +78,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
+
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('phone_number')->unique();
             $table->string('fullName')->unique();
             $table->boolean('phone_number_confirmed')->nullable();
-            $table->boolean('is_blocked')->default(false);
+            $table->boolean('is_blocked')->default(true);
             $table->boolean('is_active')->default(false);
             $table->boolean('is_completed')->default(false);
             $table->boolean('two_factor_enable')->default(false);
