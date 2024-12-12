@@ -110,6 +110,7 @@ class AuthController extends Controller
             ['role_id' => $role->id]
         );
 
+
         // Envoyer l'OTP
         $otpRequest = new Request([
             'phone_number' => $phoneNumber,
@@ -124,6 +125,10 @@ class AuthController extends Controller
             'token' => $token,
             'role'  => $role->name,
             'is_completed' => $user->is_completed,
+            'is_active' => $user->is_active,
+            'is_blocked' => $user->is_blocked,
+
+
         ]);
     }
 
@@ -178,6 +183,10 @@ class AuthController extends Controller
         'token' => $token,
         'roles' => $roles,
         'is_completed' => $user->is_completed,
+        'is_active' => $user->is_active,
+        'is_blocked' => $user->is_blocked,
+
+
     ]);
 }
 

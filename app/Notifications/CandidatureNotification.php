@@ -48,6 +48,10 @@ class CandidatureNotification extends Notification
                     ->line($this->details['body'])
                     ->action('Voir la candidature', $this->details['url'])
                     ->line('Merci d\'utiliser notre application!');
+
+                    if (isset($this->details['status'])) {
+                        $mailMessage->line('Statut de la candidature: ' . $this->details['status']);
+                    }
     }
 
     /**
@@ -60,7 +64,8 @@ class CandidatureNotification extends Notification
     {
         return [
             'body' => $this->details['body'],
-            'url' => $this->details['url']
+            'url' => $this->details['url'],
+            'status' => $this->details['status'] ?? null,
         ];
     }
 }

@@ -25,6 +25,14 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+
+
+    public function countUsers(): JsonResponse
+    {
+        $count = User::count();
+        return response()->json(['count' => $count]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -168,27 +176,23 @@ class UserController extends Controller
         return response()->json(['message' => 'Role updated successfully'], 200);
     }
 
-    // public function updateUserRole(Request $request,User $user,Role $role,UserRole $userRole): JsonResponse
-    // {
-    //     $request->validate([
-    //         'role' => 'required|string|exists:roles,name',
-    //     ]);
+    public function activateUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_blocked = false;
+        $user->save();
 
+        return response()->json(['message' => 'User activated successfully']);
+    }
 
-    //      $role = Role::where('name', $request->role)->first();
+    public function deactivateUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_blocked = true;
+        $user->save();
 
-    //      if (!$role) {
-    //          return response()->json(['error' => 'Invalid role'], 400);
-    //      }
-
-    //             // Mettre à jour le rôle de l'utilisateur
-    //             UserRole::updateOrCreate(
-    //                 ['user_id' => $user->id],
-    //                 ['role_id' => $role->id]
-    //             );
-
-    //      return response()->json(['message' => 'Role updated successfully'], 200);
-    // }
+        return response()->json(['message' => 'User deactivated successfully']);
+    }
 
 }
 

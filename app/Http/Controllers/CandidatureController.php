@@ -18,7 +18,9 @@ class CandidatureController extends Controller
     {
         $candidatures = Candidature::with('user', 'service', 'service.user')
             ->where('status', '!=', 'deleted')
+            ->orderBy('created_at', 'desc') // Trie par date de création, les plus récentes d'abord
             ->get();
+
         return response()->json($candidatures);
     }
 
@@ -75,8 +77,10 @@ class CandidatureController extends Controller
         // Préparer les détails de la notification pour l'utilisateur qui a posté le service
         $posterUserDetails = [
             'body' => 'Un utilisateur a postulé pour le service: ' . $candidature->service->title,
-            'url' => url('/candidatures/' . $candidature->id)
+            'url' => url('http://localhost:5173/profil/user/candidature/' . $candidature->id)
         ];
+
+        $roles = $user->roles()->pluck('name');
 
         // Envoyer la notification à l'utilisateur qui postule
         $user->notify(new CandidatureNotification($applyingUserDetails));
@@ -89,7 +93,8 @@ class CandidatureController extends Controller
 
         return response()->json([
             'message' => 'Candidature soumise avec succès et notifications envoyées!',
-            'candidature' => $candidature
+            'candidature' => $candidature,
+            'roles' => $roles
         ], 201);
     }
 
@@ -107,6 +112,7 @@ class CandidatureController extends Controller
         $candidatures = Candidature::with('service', 'user', 'service.user.details', 'user.details')
             ->where('user_id', $userId)
             ->where('status', '!=', 'deleted')
+            ->orderBy('updated_at', 'desc') // Trie par date de mise à jour
             ->get();
 
         return response()->json($candidatures);
@@ -119,10 +125,12 @@ class CandidatureController extends Controller
         $candidatures = Candidature::with('service', 'user', 'service.user')
             ->where('service_id', $serviceId)
             ->where('status', '!=', 'deleted')
+            ->orderBy('updated_at', 'desc') // Trie par date de mise à jour
             ->get();
 
         return response()->json($candidatures);
     }
+
 
 
     // Récupère les candidatures pour tous les services postés par un utilisateur spécifique
@@ -132,11 +140,11 @@ class CandidatureController extends Controller
         $candidatures = Candidature::with('service', 'user', 'service.user.details', 'user.details')
             ->whereIn('service_id', $services)
             ->where('status', '!=', 'deleted')
+            ->orderBy('updated_at', 'desc') // Trie par date de mise à jour
             ->get();
 
         return response()->json($candidatures);
     }
-
 
     // Met à jour les détails d'une candidature
     public function update(Request $request, $id)
@@ -168,6 +176,60 @@ class CandidatureController extends Controller
     }
 
     // Change le statut d'une candidature
+    // public function changeStatus(Request $request, $id)
+    // {
+    //     $candidature = Candidature::findOrFail($id);
+    //     $validatedData = $request->validate([
+    //         'status' => 'required|in:pending,accepted,rejected,canceled,deleted',
+    //     ]);
+
+    //     $candidature->status = $validatedData['status'];
+    //     $candidature->save();
+
+    //     return response()->json([
+    //         'message' => 'Statut de la candidature mis à jour avec succès',
+    //         'candidature' => $candidature
+    //     ]);
+    // }
+
+
+
+    //     public function changeStatus(Request $request, $id)
+    // {
+    //     $candidature = Candidature::findOrFail($id);
+    //     $validatedData = $request->validate([
+    //         'status' => 'required|in:pending,accepted,rejected,canceled,deleted',
+    //     ]);
+
+    //     // Mettre à jour le statut de la candidature
+    //     $candidature->status = $validatedData['status'];
+    //     $candidature->save();
+
+    //     // Préparer les détails de la notification pour le postulant
+    //     $applicantNotificationDetails = [
+    //         'body' => 'Le statut de votre candidature pour le service : ' . $candidature->service->title . ' a été mis à jour en : ' . $validatedData['status'],
+    //         'url' => url('/candidatures/' . $candidature->id),
+    //         'status' => $validatedData['status']
+    //     ];
+
+    //     // Envoyer la notification au postulant
+    //     $candidature->user->notify(new CandidatureNotification($applicantNotificationDetails));
+
+    //     // Préparer les détails de la notification pour le créateur du service
+    //     $posterNotificationDetails = [
+    //         'body' => 'Le statut de la candidature pour votre service : ' . $candidature->service->title . ' a été mis à jour en : ' . $validatedData['status'],
+    //         'url' => url('/candidatures/' . $candidature->id),
+    //         'status' => $validatedData['status']
+    //     ];
+
+    //     // Envoyer la notification au créateur du service
+    //     $candidature->service->user->notify(new CandidatureNotification($posterNotificationDetails));
+
+    //     return response()->json([
+    //         'message' => 'Statut de la candidature mis à jour avec succès et notifications envoyées',
+    //         'candidature' => $candidature
+    //     ]);
+    // }
     public function changeStatus(Request $request, $id)
     {
         $candidature = Candidature::findOrFail($id);
@@ -175,14 +237,53 @@ class CandidatureController extends Controller
             'status' => 'required|in:pending,accepted,rejected,canceled,deleted',
         ]);
 
+        // Mettre à jour le statut de la candidature
         $candidature->status = $validatedData['status'];
         $candidature->save();
 
+        // Traductions des statuts en français
+        $statusMessages = [
+            'pending' => 'Votre candidature est en attente de traitement.',
+            'accepted' => 'Félicitations, votre candidature a été acceptée !',
+            'rejected' => 'Malheureusement, votre candidature a été rejetée.',
+            'canceled' => 'Votre candidature a été annulée.',
+            'deleted' => 'Votre candidature a été supprimée.'
+        ];
+
+        $statusLabels = [
+            'pending' => 'en attente',
+            'accepted' => 'acceptée',
+            'rejected' => 'rejetée',
+            'canceled' => 'annulée',
+            'deleted' => 'supprimée'
+        ];
+
+        // Préparer les détails de la notification pour le postulant
+        $applicantNotificationDetails = [
+            'body' => $statusMessages[$validatedData['status']] . ' Service : ' . $candidature->service->title,
+            'url' => url('/candidatures/' . $candidature->id),
+            'status' => $statusLabels[$validatedData['status']] // Utiliser le statut en français
+        ];
+
+        // Envoyer la notification au postulant
+        $candidature->user->notify(new CandidatureNotification($applicantNotificationDetails));
+
+        // Préparer les détails de la notification pour le créateur du service
+        $posterNotificationDetails = [
+            'body' => 'Le statut de la candidature pour votre service : ' . $candidature->service->title . ' a été mis à jour en : ' . $statusLabels[$validatedData['status']] . ' par ' . $candidature->user->fullName,
+            'url' => url('/candidatures/' . $candidature->id),
+            'status' => $statusLabels[$validatedData['status']] // Utiliser le statut en français
+        ];
+
+        // Envoyer la notification au créateur du service
+        $candidature->service->user->notify(new CandidatureNotification($posterNotificationDetails));
+
         return response()->json([
-            'message' => 'Statut de la candidature mis à jour avec succès',
+            'message' => 'Statut de la candidature mis à jour avec succès et notifications envoyées',
             'candidature' => $candidature
         ]);
     }
+
 
     // Compte le nombre de candidatures pour un service spécifique
     public function countCandidaturesByService($serviceId)
@@ -195,8 +296,8 @@ class CandidatureController extends Controller
     public function getPendingCandidatures()
     {
         $candidatures = Candidature::with('user', 'service')
-                        ->where('status', 'pending')
-                        ->get();
+            ->where('status', 'pending')
+            ->get();
 
         return response()->json($candidatures);
     }

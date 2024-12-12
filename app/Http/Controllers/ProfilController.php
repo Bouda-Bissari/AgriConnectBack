@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class ProfilController extends Controller
@@ -25,7 +26,7 @@ class ProfilController extends Controller
      */
     public function index(): JsonResponse
     {
-        $profiles = User::with('details','roles')->get();
+        $profiles = User::with('details', 'roles')->get();
         return response()->json(($profiles));
     }
 
@@ -61,125 +62,247 @@ class ProfilController extends Controller
      * @param User $user
      * @return JsonResponse
      */
+
+
+
+    //  public function show($userId): JsonResponse
+    //  {
+    //      // Récupérer l'utilisateur demandé avec ses détails
+    //      $requestedUser = User::with('details')->find($userId);
+
+    //      if (!$requestedUser) {
+    //          return response()->json(['error' => 'User not found'], 404);
+    //      }
+
+    //      // Récupérer l'utilisateur authentifié
+    //      /** @var User $authenticatedUser */
+    //      $authenticatedUser = Auth::user();
+
+    //      // Vérifiez que l'utilisateur authentifié existe
+    //      if (!$authenticatedUser) {
+    //          return response()->json(['error' => 'Authenticated user not found']);
+    //      }
+
+    //      // Vérifiez que l'utilisateur authentifié a des rôles
+    //      $roles = $authenticatedUser->roles()->get();
+    //      if ($roles->isEmpty()) {
+    //          return response()->json(['error' => 'No roles assigned to authenticated user']);
+    //      }
+
+    //      // Vérifier si l'utilisateur authentifié est soit l'utilisateur demandé, soit un administrateur
+    //      $isAdmin = $roles->where('name', 'admin')->isNotEmpty();
+
+    //      // Si l'utilisateur n'est pas un administrateur et qu'il essaie d'accéder à un autre profil, renvoyer une erreur
+    //      if ($authenticatedUser->id !== (int)$userId && !$isAdmin) {
+    //          return response()->json([
+    //              'error' => 'Unauthorized',
+    //              'authenticatedUserId' => $authenticatedUser->id,
+    //              'requestedUserId' => $userId,
+    //              'isAdmin' => $isAdmin
+    //          ]);
+    //      }
+
+    //      // Retourner les détails de l'utilisateur demandé
+    //      return response()->json($requestedUser);
+    //  }
+
+
+
+
+
+
     public function show($userId): JsonResponse
-{
-    $user = User::with('details')->find($userId);
-    $authenticatedUser = Auth::user();
+    {
 
-    // // Vérifiez que l'utilisateur connecté demande ses propres détails
-    // if (!$user || $authenticatedUser->id !== (int)$userId) {
-    //     return response()->json(['error' => 'Unauthorized'], 403);
+
+        $user = User::with('details')->find($userId);
+        // $authenticatedUser = Auth::user();
+
+        // // Vérifiez que l'utilisateur connecté demande ses propres détails
+        // if (!$user || $authenticatedUser->id !== (int)$userId) {
+        //     return response()->json(['error' => 'Unauthorized'], 403);
+        // }
+
+
+
+        return response()->json($user);
+    }
+
+
+
+
+
+
+
+    public function updateadmin(Request $request, $userId)
+    {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'email' => 'nullable|email',
+            'fullName' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Find the user record
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // Update the user fields
+        $user->update([
+            'fullName' => $request->input('fullName', $user->fullName),
+            'phone_number' => $request->input('phone_number', $user->phone_number),
+        ]);
+
+        // Find or create the associated details record
+        $detail = $user->details; // Assuming there's a one-to-one relationship
+
+        if (!$detail) {
+            $detail = new Detail();
+            $detail->user_id = $userId;
+        }
+
+        // Update detail fields
+        $detail->email = $request->input('email', $detail->email);
+        $detail->address = $request->input('address', $detail->address);
+
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($detail->image && Storage::disk('public')->exists($detail->image)) {
+                Storage::disk('public')->delete($detail->image);
+            }
+
+            // Store the new image in the public/images directory
+            $path = $request->file('image')->store('profile_images', 'public');
+            $detail->image = $path;
+        }
+
+        // Save the detail record
+        $detail->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user,
+            'details' => $detail
+        ]);
+    }
+
+
+
+
+    public function update(UpdateProfileRequest $request, $userId): JsonResponse
+    {
+
+
+        // Récupérer l'utilisateur par son ID
+        $user = User::with('details')->findOrFail($userId);
+
+        // Mise à jour des informations de l'utilisateur
+        $user->update($request->only(['fullName', 'phone_number']));
+
+
+
+        // Mettre à jour le statut du profil
+        $user->update(['is_completed' => true]);
+
+        // Récupérer ou créer les détails associés
+        $details = $user->details;
+
+        if (!$details) {
+            $details = new Detail();
+            $details->user_id = $user->id;
+        }
+
+        // Mettre à jour les détails
+        $details->fill($request->only([
+            'email',
+            'date',
+            'gender',
+            'bio',
+            'company_name',
+            'address',
+            'domaine',
+        ]));
+        $details->save();
+
+        // Gérer l'image
+        if ($request->hasFile('image')) {
+            // Enregistrer la nouvelle image
+            $imagePath = $request->file('image')->store('images', 'public');
+            $details->image = $imagePath;
+            $details->save();  // Assurez-vous que les modifications sont enregistrées
+        }
+
+        // Les réponses (utile)
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès',
+            'details' => $details,
+            'image' => $details->image,
+            'completed' => $user->is_completed,
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+    // public function update(UpdateProfileRequest $request, $userId): JsonResponse
+    // {
+    //     $authenticatedUser = Auth::user();
+
+    //     // Vérifiez que l'utilisateur connecté peut mettre à jour ses propres informations
+    //     if ($authenticatedUser->id !== (int)$userId) {
+    //         return response()->json(['error' => 'Unauthorized'], 403);
+    //     }
+
+    //     $user = User::findOrFail($userId);
+
+    //     // Mise à jour des informations de l'utilisateur
+    //     $user->update($request->only(['fullName', 'phone_number']));
+
+    //     $details = $user->details;
+
+    //     if (!$details) {
+    //         $details = new Detail();
+    //         $details->user_id = $user->id;
+    //     }
+
+    //     $details->update($request->only([
+    //         'email',
+    //         'age',
+    //         'gender',
+    //         'bio',
+    //         'company_name',
+    //         'address',
+    //         'domaine'
+    //     ]));
+
+    //     if ($request->hasFile('image')) {
+    //         $file = $request->file('image');
+    //         $filePath = $file->store('avatars', 'public');
+    //         $user->image = $filePath;
+    //         $user->save();
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Profil mis à jour avec succès',
+    //         "details" => $details,
+    //         "request" => $request->all()
+    //     ]);
     // }
-
-
-
-    return response()->json($user);
-}
-
-
-
-public function update(UpdateProfileRequest $request, $userId): JsonResponse
-{
-
-
-    // Récupérer l'utilisateur par son ID
-    $user = User::with('details')->findOrFail($userId);
-
-    // Mise à jour des informations de l'utilisateur
-    $user->update($request->only(['fullName', 'phone_number']));
-
-    // Mettre à jour le statut du profil
-    $user->update(['is_completed' => true]);
-
-    // Récupérer ou créer les détails associés
-    $details = $user->details;
-
-    if (!$details) {
-        $details = new Detail();
-        $details->user_id = $user->id;
-    }
-
-    // Mettre à jour les détails
-    $details->fill($request->only([
-        'email',
-        'date',
-        'gender',
-        'bio',
-        'company_name',
-        'address',
-        'domaine',
-    ]));
-    $details->save();
-
-    // Gérer l'image
-    if ($request->hasFile('image')) {
-        // Enregistrer la nouvelle image
-        $imagePath = $request->file('image')->store('images', 'public');
-        $details->image = $imagePath;
-        $details->save();  // Assurez-vous que les modifications sont enregistrées
-    }
-
-    // Les réponses (utile)
-    return response()->json([
-        'message' => 'Profil mis à jour avec succès',
-        'details' => $details,
-        'image' => $details->image,
-        'completed' => $user->is_completed,
-    ]);
-}
-
-
-
-
-
-
-
-
-
-// public function update(UpdateProfileRequest $request, $userId): JsonResponse
-// {
-//     $authenticatedUser = Auth::user();
-
-//     // Vérifiez que l'utilisateur connecté peut mettre à jour ses propres informations
-//     if ($authenticatedUser->id !== (int)$userId) {
-//         return response()->json(['error' => 'Unauthorized'], 403);
-//     }
-
-//     $user = User::findOrFail($userId);
-
-//     // Mise à jour des informations de l'utilisateur
-//     $user->update($request->only(['fullName', 'phone_number']));
-
-//     $details = $user->details;
-
-//     if (!$details) {
-//         $details = new Detail();
-//         $details->user_id = $user->id;
-//     }
-
-//     $details->update($request->only([
-//         'email',
-//         'age',
-//         'gender',
-//         'bio',
-//         'company_name',
-//         'address',
-//         'domaine'
-//     ]));
-
-//     if ($request->hasFile('image')) {
-//         $file = $request->file('image');
-//         $filePath = $file->store('avatars', 'public');
-//         $user->image = $filePath;
-//         $user->save();
-//     }
-
-//     return response()->json([
-//         'message' => 'Profil mis à jour avec succès',
-//         "details" => $details,
-//         "request" => $request->all()
-//     ]);
-// }
 
 
 

@@ -42,13 +42,13 @@ class UpdateProfileRequest extends FormRequest
 //     Rule::unique('details', 'email')->ignore($detail->id),
 // ],
 
-                     'date' => 'nullable',
-            'gender' => 'nullable|string|in:Masculin,Feminin,other',
+                     'date' => 'required',
+            'gender' => 'required|string|in:Masculin,Feminin,other',
             'image' => 'nullable|file|mimes:jpg,png,jpeg',
-            'bio' => 'nullable|string|max:1000',
+            'bio' => 'required|string|max:1000',
             'company_name' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'domaine' => 'nullable|string|max:255',
+            'address' => 'required|string|max:255',
+            'domaine' => 'required|string|max:255',
         ];
     }
 

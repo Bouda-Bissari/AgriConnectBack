@@ -25,7 +25,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'phone_number' => 'required|string|digits:11|unique:users,phone_number',
-            'fullName' => 'required|string|unique:users,fullName',
+            'fullName' => 'required|string',
             'role' => 'required|string',
             'password' => [
                 'required',
@@ -49,7 +49,6 @@ class RegisterRequest extends FormRequest
             'phone_number.digits' => "Le numéro de téléphone n'est pas valide.",
             'phone_number.unique' => "Ce numéro de téléphone est déjà utilisé.",
             'fullName.required' => "Le nom complet est requis.",
-            'fullName.unique' => "Ce nom est deja utiliser.",
 
             'fullName.string' => "Le nom complet doit être une chaîne de caractères.",
             'role.required' => "Le rôle est requis.",
@@ -60,4 +59,8 @@ class RegisterRequest extends FormRequest
             'password_confirmation.required' => "La confirmation du mot de passe est requise.",
         ];
     }
+
+
+
+
 }

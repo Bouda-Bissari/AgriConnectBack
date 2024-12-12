@@ -15,7 +15,7 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $reports = Report::with('user', 'service')->get();
+        $reports = Report::with('user', 'service','service.user')->get();
         return response()->json($reports);
     }
 

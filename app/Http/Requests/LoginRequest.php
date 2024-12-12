@@ -28,4 +28,21 @@ class LoginRequest extends FormRequest
             'password' => 'required|string',
         ];
     }
+
+
+    /**
+     * Personnaliser les messages de validation.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'phone_number.required' => "Le numéro de téléphone est requis.",
+            'phone_number.string' => "Le numéro de téléphone doit être une chaîne de caractères.",
+            'phone_number.exists' => "Le numéro de téléphone n'existe pas dans notre base de données.",
+            'password.required' => "Le mot de passe est requis.",
+            'password.string' => "Le mot de passe doit être une chaîne de caractères.",
+        ];
+    }
 }

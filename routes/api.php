@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CandidatureController;
 use App\Http\Controllers\DetailController;
@@ -18,11 +19,27 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::apiResource('/roles', RoleController::class);
+Route::post('/admin/login', [AdminAuthController::class, 'login']);
 
+
+// Groupe de routes protégées par le middleware 'role'
+
+Route::middleware(['role:admin'])->group(function () {
+
+});
+
+// routes proteger pour l'admin
+Route::get('/users/count-by-role', [AdminAuthController::class, 'countUsersByRole']);
+Route::get('/users/count', [AdminAuthController::class, 'countUsers']);
+Route::get('/services/count', [AdminAuthController::class, 'countServices']);
+
+Route::get('/users/role/{roleName}', [AdminAuthController::class, 'getUsersByRole']);
+Route::put('/users/activate/{id}', [UserController::class, 'activateUser']);
+Route::put('/users/deactivate/{id}', [UserController::class, 'deactivateUser']);
+Route::post('/profile/{userId}/update', [ProfilController::class, 'updateadmin']);
 
 Route::post('/send-otp', [SignController::class, 'sendOtp']);
 Route::post('/verify-otp', [SignController::class, 'verifyOtp']);
-// Route::post('/profile-update/{ptofile}', [ProfilController::class,'save']);
 
 
 Route::apiResource('/candidature', CandidatureController::class);
@@ -55,37 +72,38 @@ Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{service}', [ServiceController::class, 'show']);
 
 
-Route::get('/detailservice/{id}', [DetailServiceController::class,'show']);
-Route::delete('/profile/{userId}/image', [ProfilController::class, 'deleteImage']);
+Route::get('/detailservice/{id}', [DetailServiceController::class, 'show']);
+// Route::delete('/profile/{userId}/image', [ProfilController::class, 'deleteImage']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::apiResource('/profile', ProfilController::class);
 
+    Route::apiResource('/profile', ProfilController::class);
 
     Route::get('/notifications', [NotificationCandidatureController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationCandidatureController::class, 'show']);
     Route::post('/notifications/{id}/markAsRead', [NotificationCandidatureController::class, 'update']);
     Route::delete('/notifications/{id}', [NotificationCandidatureController::class, 'destroy']);
 
-//services
-// Route pour créer un nouveau service (store)
-Route::post('/services', [ServiceController::class, 'store']);
+    //services
+    // Route pour créer un nouveau service (store)
+    Route::post('/services', [ServiceController::class, 'store']);
 
-Route::patch('/service/{service}/update-deleted-status', [ServiceController::class, 'updateDeletedStatus']);
+    Route::patch('/service/{service}/update-deleted-status', [ServiceController::class, 'updateDeletedStatus']);
 
 
-// Route pour mettre à jour un service spécifique (update)
-Route::put('/services/{service}', [ServiceController::class, 'update']);
+    // Route pour mettre à jour un service spécifique (update)
+    Route::put('/services/{service}', [ServiceController::class, 'update']);
 
     // Route pour obtenir le nombre de candidatures associées à un service
-Route::get('/services/{service}/count-applications', [ServiceController::class, 'countApplications']);
+    Route::get('/services/{service}/count-applications', [ServiceController::class, 'countApplications']);
 
 
-// Route pour obtenir les candidatures associées à un service
-Route::get('/services/{service}/get-applications', [ServiceController::class, 'getApplications']);
+    // Route pour obtenir les candidatures associées à un service
+    Route::get('/services/{service}/get-applications', [ServiceController::class, 'getApplications']);
 
     Route::apiResource('/reports', ReportController::class);
 
@@ -102,9 +120,7 @@ Route::get('/services/{service}/get-applications', [ServiceController::class, 'g
     Route::apiResource('/users', UserController::class);
     Route::apiResource('/details', DetailController::class);
 
-    Route::middleware(['role:admin'])->group(function () {
-        // Route::apiResource('/roles', RoleController::class);
-    });
+
 
 
 });
